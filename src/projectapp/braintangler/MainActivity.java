@@ -1,10 +1,13 @@
 package projectapp.braintangler;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 
 public class MainActivity extends Activity {
@@ -12,12 +15,42 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.jw_mainscreen);
         
-        
-       Log.d("Testing...", "1...2...3...");
+        setupGame1Button();
+        setupGame2Button();
+        setupGame3Button();
     }
 
+    private void setupGame1Button() {
+    	Button button = (Button) findViewById(R.id.button1);
+    	button.setOnClickListener(new View.OnClickListener() {
+    		@Override
+    		public void onClick(View v) {
+    			startActivity(new Intent(MainActivity.this, Game1.class));
+    		}
+    	});
+    }
+    
+    private void setupGame2Button() {
+    	Button button = (Button) findViewById(R.id.button2);
+    	button.setOnClickListener(new View.OnClickListener() {
+    		@Override
+    		public void onClick(View v) {
+    			startActivity(new Intent(MainActivity.this, Game2.class));
+    		}
+    	});
+    }
+    
+    private void setupGame3Button() {
+    	Button button = (Button) findViewById(R.id.button3);
+    	button.setOnClickListener(new View.OnClickListener() {
+    		@Override
+    		public void onClick(View v) {
+    			startActivity(new Intent(MainActivity.this, Game3.class));
+    		}
+    	});
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
