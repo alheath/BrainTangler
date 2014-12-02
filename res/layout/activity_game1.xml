@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/textView1"
-        android:text="Instructions: Tap the screen to start. Drag available pieces with your finger across the screen and fit them together in the space above. Mismatching any piece will return it to the bottom of the screen. Correctly fit all pieces within the time limit."
+        android:text="Instructions: Tap the screen to start. Drag available pieces with your finger across the screen and fit them together in the space above. If a piece is correctly placed, it will lock into the puzzle and will no longer be able to drag. Correctly fit all pieces within the time limit."
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
