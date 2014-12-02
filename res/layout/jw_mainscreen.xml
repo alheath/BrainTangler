@@ -1,6 +1,7 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="30dp" >
 
@@ -8,45 +9,49 @@
         android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
         android:paddingBottom="5dp"
         android:text="Main Menu"
         android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_below="@+id/button2"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:text="MazeMaster" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_below="@+id/menutexttv"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_vertical"
+        android:text="Picture Puzzle"/>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_below="@+id/button1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_vertical"
+        android:text="Card Matching" />
 
     <TextView
         android:id="@+id/menutexttv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select your game:" >
-    </TextView>
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/TextView01"
+        android:text="Select your game:" 
+        android:paddingBottom="15dp"/>
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Game 1" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Game 2" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Game 3" />
-
-    <Button
-        android:id="@+id/Stats"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Player Stats" />
-
-    <Button
-        android:id="@+id/Quit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Quit" />
-
-</LinearLayout>
+</RelativeLayout>

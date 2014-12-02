@@ -17,11 +17,17 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.jw_mainscreen);
         
+        //arrayList<> = new arrayList<>;
+        
+        //int a[];
+        
+        //for(int i = 0; a[i]; i++) {
+        
         setupGame1Button();
         setupGame2Button();
         setupGame3Button();
     }
-
+    
     private void setupGame1Button() {
     	Button button = (Button) findViewById(R.id.button1);
     	button.setOnClickListener(new View.OnClickListener() {

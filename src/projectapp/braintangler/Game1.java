@@ -13,11 +13,13 @@ public class Game1 extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_second);
+		setContentView(R.layout.activity_game1);
 		
-		setupDifficultyButton();
+		//setupDifficultyButton();
+		//setupInstructionsButton();
 	}
 
+	/*
 	private void setupDifficultyButton() {
     	Button button = (Button) findViewById(R.id.button1);
     	button.setOnClickListener(new View.OnClickListener() {
@@ -26,7 +28,17 @@ public class Game1 extends Activity {
     			startActivity(new Intent(Game1.this, DifficultySettings.class));
     		}
     	});
-    }
+    }*/
+	
+	/*private void setupInstructionsButton() {
+    	Button button = (Button) findViewById(R.id.button2);
+    	button.setOnClickListener(new View.OnClickListener() {
+    		@Override
+    		public void onClick(View v) {
+    			startActivity(new Intent(Game1.this, Instructions1.class));
+    		}
+    	});
+    }*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
