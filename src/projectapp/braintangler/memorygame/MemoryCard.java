@@ -16,7 +16,7 @@ public class MemoryCard {
 	public MemoryCard(int img_id, int row, int col) {
 		this.state = FACE_DOWN;
 		this.face_up_img_id = img_id;
-		this.face_down_img_id = R.drawable.memory_back_080;
+		this.face_down_img_id = 18; //18 -> card back
 		this.row = row;
 		this.col = col;
 	}

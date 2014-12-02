@@ -1,12 +1,17 @@
 package projectapp.braintangler.memorygame;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import projectapp.braintangler.R;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
@@ -14,9 +19,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 public class MemoryGame extends Thread {
-//	public static final int EASY = 0;
-//	public static final int MED = 1;
-//	public static final int HARD = 2;
 	
 	private final SurfaceHolder sHolder;
 	private final Handler mButtonHandler;
@@ -29,47 +31,52 @@ public class MemoryGame extends Thread {
 	private static final int GAME_OVER = 3;
 	
 	private int solved;
+	private int points;
 	private int state;
 	private boolean run;
+	private final Object runLock;
 	private GameGrid gGrid;
-	private boolean isNewGame;
 	private MotionEvent mTouchEvent;
 	
-	private final int rows;
-	private final int cols;
+	private int rows;
+	private int cols;
 	private int bRow;
 	private int bCol;
 
 	private GameTimer gTimer;
+	private int level;
+	
+	//private BTCountDownTimer gameTimer;
 	
 	public MemoryGame(SurfaceHolder holder, Handler buttonHandler, Handler scoreHandler, 
-			Handler timeHandler, int rows, int cols) {
+			Handler timeHandler, int level) {
 		this.sHolder = holder;
 		this.mButtonHandler = buttonHandler;
-		this.mScoreHandler = scoreHandler;
+		this.mScoreHandler = scoreHandler;	
 		this.mTimeHandler = timeHandler;
 		
-		isNewGame = true;
-		
-		this.rows = rows;
-		this.cols = cols;
 		bRow = -1;
 		bCol = -1;
 		
 		run = false;
+		runLock = new Object();
+		
 		state = READY;
 		
 		gGrid = GameGrid.BLANK;
 		solved = 0;
+		points = 0;
 		
 		gTimer = new GameTimer();
+		
+		setGridDims(level);
+		this.level = level;
 	}
 	
 	@Override
 	public void run() {
-		Looper.prepare();
-		int skipTicks = 1000 / 20;
-		long mNextGameTick = SystemClock.uptimeMillis();
+		//int skipTicks = 1000 / 20;
+		//long mNextGameTick = SystemClock.uptimeMillis();
 		while (run) {
 			Canvas canvas = null;
 			try {
@@ -79,7 +86,7 @@ public class MemoryGame extends Thread {
 						if (state == PLAYING) {
 							updateGame();
 						}
-						synchronized (new Object()) {
+						synchronized (runLock) {
 							if (run) {
 								updateDisplay();
 							}
@@ -91,52 +98,43 @@ public class MemoryGame extends Thread {
 					sHolder.unlockCanvasAndPost(canvas);
 				}
 			}
-			mNextGameTick += skipTicks;
-			long sleepTime = mNextGameTick - SystemClock.uptimeMillis();
-			if (sleepTime > 0) {
-				try {
-					Thread.sleep(sleepTime);
-				} catch (InterruptedException e) {
-				// don't care
-				}
-			}
+//			mNextGameTick += skipTicks;
+//			long sleepTime = mNextGameTick - SystemClock.uptimeMillis();
+//			if (sleepTime > 0) {
+//				try {
+//					Thread.sleep(sleepTime);
+//				} catch (InterruptedException e) {
+//				// don't care
+//				}
+//			}
+			
 		}
-		Looper.loop();
 	}
 	
 	public int getScore() { return solved * 10; }
 	
 	private void initGrid() {
 		gGrid = new GameGrid(rows, cols);
-		int[] temp = {
-				R.drawable.memorycard000,
-				R.drawable.memorycard000,
-				R.drawable.memorycard001,
-				R.drawable.memorycard001,
-				R.drawable.memorycard002,
-				R.drawable.memorycard002,
-				R.drawable.memorycard003,
-				R.drawable.memorycard003,
-				R.drawable.memorycard004,
-				R.drawable.memorycard004,
-				R.drawable.memorycard005,
-				R.drawable.memorycard005,
-				R.drawable.memorycard006,
-				R.drawable.memorycard006,
-				R.drawable.memorycard007,
-				R.drawable.memorycard007,
-		};
 		
-		shuffleArray(temp);
+		int[] colors = new int[rows*cols];
 		
+		for(int i = 0; i < (rows*cols / 2); i++){
+			colors[2*i] = i;
+			colors[2*i + 1] = i;
+		}
+		
+		shuffleArray(colors);
+		
+		Log.d("test", "size of colors array is: " + colors.length);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				MemoryCard x = new MemoryCard(temp[4*i+j], i, j);
+				MemoryCard x = new MemoryCard(colors[cols*i+j], i, j);
 				gGrid.setCardAt(x, i, j);
+				//Log.d("test", "" + colors[cols*i+j]);
 			}
-		}	
+		}
 		
-		solved = 0;
+		
 	}
 	
 	public void startGame() {
@@ -147,10 +145,17 @@ public class MemoryGame extends Thread {
 		}
 	}
 	
+	public void startGame(long addTime) {
+		synchronized(sHolder) {
+			initGrid();
+			gTimer.add(30000);
+			setState(PLAYING);
+		}
+	}
+	
 	private void updateGame() {
 		//Log.d("test", "update game");
 		MemoryCard mc = gGrid.getCardAt(bRow,bCol);
-		if (mc != null) Log.d("test", "" + bRow + " " + bCol);
 		if (mc != null && mc.getState() == MemoryCard.FACE_DOWN) {
 			MemoryCard selected = gGrid.getSelectedCard();
 			if (selected != null) {
@@ -158,12 +163,13 @@ public class MemoryGame extends Thread {
 				if (selected.equals(mc)) {
 					selected.setState(MemoryCard.SOLVED);
 					mc.setState(MemoryCard.SOLVED);
+					
 					solved += 2;
+					points += 10;
 					if (allSolved()) {
-						solved += 2;
+						points += 40;
 						updateDisplay();
-						run = false;
-						setState(GAME_OVER);
+						pause();
 					}
 				} else {
 					gGrid.selectCard(mc);
@@ -176,7 +182,6 @@ public class MemoryGame extends Thread {
 	private void setState(int state) {
 		synchronized (sHolder) {
 			this.state = state;
-			Log.d("test", "set state");
 		}
 //		if(state == GAME_OVER) {
 //			long elapsed = gTimer.elapsed() / 1000;
@@ -202,25 +207,33 @@ public class MemoryGame extends Thread {
 	}
 
 	private void updateDisplay() {
-		for (int row = 0; row < gGrid.getRows(); row++) {
-			for (int col = 0; col < gGrid.getCols(); col++) {
-				MemoryCard mc = gGrid.getCardAt(row, col);
-				
-				int image = mc.getCurrentImage();
-				int buttonId = 4*row + col;
-				
-				setButtonImage(image, buttonId);				
-				//Update button image
+		if (state == PLAYING) {
+			
+			for (int m = 0; m < gGrid.getRows(); m++) {
+				for (int n = 0; n < gGrid.getCols(); n++) {
+					MemoryCard mc = gGrid.getCardAt(m, n);
+					
+					int image = mc.getCurrentImage();
+					int buttonId = 6*m + n;
+						
+					setButtonImage(image, buttonId);
+					
+//					if (mc.getState() == MemoryCard.SOLVED && delay <= 0) {
+//						mc.setFaceUpImage(R.drawable.transparent);
+//					}
+				}
 			}
+			setTimeText();
+			setScore();
 		}
-		setTimeText();
-		setScore();
 	}
 	
 	private void setButtonImage(int image, int buttonId) {
 		 Message msg = mButtonHandler.obtainMessage();
 		 Bundle b = new Bundle();
 		 b.putInt("image", image);
+//		 b.putInt("row", rows);
+//		 b.putInt("col", cols);
 		 b.putInt("button", buttonId);
 		 msg.setData(b);
 		 mButtonHandler.sendMessage(msg);	
@@ -229,20 +242,24 @@ public class MemoryGame extends Thread {
 	private void setScore() {
 		 Message msg = mScoreHandler.obtainMessage();
 		 Bundle b = new Bundle();
-		 b.putInt("score", solved * 10);
+		 b.putBoolean("allsolved", allSolved());
+		 b.putInt("score", points);
 		 msg.setData(b);
 		 mScoreHandler.sendMessage(msg);	
 	}
+	
 	private void setTimeText() {
 		 Message msg = mTimeHandler.obtainMessage();
 		 String message = gTimer.toString();
 		 
 		 msg.obj = message;
-		 mTimeHandler.sendMessage(msg);	
+		 mTimeHandler.sendMessage(msg);
 	}
 
 	public void setRunning(boolean running) {
-		run = running;
+		synchronized (runLock) {
+			run = running;
+		}
 	}
 	
 	public boolean allSolved() {
@@ -278,6 +295,7 @@ public class MemoryGame extends Thread {
 	public void setButtonLocs(int row, int col) {
 		bRow = row;
 		bCol = col;
+		//flipped = true;
 	}
 
 	 public void onTouch(MotionEvent event) {
@@ -300,16 +318,75 @@ public class MemoryGame extends Thread {
 		 }
 		 
 	}
-	  static void shuffleArray(int[] ar)
-	  {
-	    Random rnd = new Random();
-	    for (int i = ar.length - 1; i > 0; i--)
+	 
+	private void setGridDims(int level)
+	{
+		switch(level)
+		{
+		case 0:
+			this.rows = 4;
+			this.cols = 2;
+			break;
+		case 1:
+			this.rows = 4;
+			this.cols = 3;
+			break;
+		case 2:
+			this.rows = 4;
+			this.cols = 4;
+			break;
+		case 3:
+			this.rows = 5;
+			this.cols = 4;
+			break;
+		case 4:
+			this.rows = 6;
+			this.cols = 4;
+			break;
+		case 5:
+			this.rows = 6;
+			this.cols = 5;
+			break;
+		default:
+			this.rows = 6;
+			this.cols = 6;
+		}
+	}
+	
+	public void nextLevel()
+	{
+		pause();
+		synchronized (sHolder) {
+			bRow = -1;
+			bCol = -1;
+			
+			solved = 0;
+			
+			gGrid = GameGrid.BLANK;
+
+			setGridDims(++level);
+		}
+	}
+	
+	static void shuffleArray(int[] ar) {
+		Random rnd = new Random();
+		rnd.nextInt();
+	    for (int i = 0; i < ar.length; i++)
 	    {
-	      int index = rnd.nextInt(i + 1);
+	      int index = i + rnd.nextInt(ar.length - i);
 	      // Simple swap
 	      int a = ar[index];
 	      ar[index] = ar[i];
 	      ar[i] = a;
 	    }
-	  }
+	}
+
+	public int getRows() {
+		return rows;
+	}
+	
+	public int getCols() {
+		return cols;
+	}
+
 }

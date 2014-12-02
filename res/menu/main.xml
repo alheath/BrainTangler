@@ -1,11 +1,14 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="projectapp.braintangler.MainActivity" >
-
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item
+	    android:id="@+id/restart"
+	    android:showAsAction="always|withText"
+	    android:title="Restart"/>
+	<item
+	    android:id="@+id/resume"
+	    android:showAsAction="always|withText"
+	    android:title="Resume"/>
+	<item
+	    android:id="@+id/Exit"
+	    android:showAsAction="always|withText"
+	    android:title="Exit"/>
 </menu>

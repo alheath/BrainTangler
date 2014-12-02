@@ -6,5 +6,26 @@
     <string name="action_settings">Settings</string>
     <string name="memory_game">Memory Game</string>
     <string name="desc">represents a card in the matching card game</string>
+    <string name="zero_time">00:00</string>
 
+    <string-array name="palette">
+        <item>FF0000</item>
+        <item>00FF00</item>
+        <item>0000FF</item>
+        <item>FFFF00</item>
+        <item>00FFFF</item>
+        <item>FF00FF</item>
+        <item>FF8800</item>
+        <item>920CE8</item>
+        <item>000000</item>
+        <item>65350F</item>
+        <item>7E7D44</item>
+        <item>756EB2</item>
+        <item>B25860</item>
+        <item>5C655A</item>
+        <item>E5CC67</item>
+        <item>006554</item>
+        <item>4C0C46</item>
+        <item>7FBCFF</item>
+    </string-array>
 </resources>

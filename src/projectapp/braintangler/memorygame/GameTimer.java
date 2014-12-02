@@ -1,13 +1,12 @@
 package projectapp.braintangler.memorygame;
 
+import android.annotation.SuppressLint;
 import android.os.CountDownTimer;
 import android.util.Log;
 
 public class GameTimer {
 	long millisInit;
 	long millisRemaining;
-	long countDownInterval;
-	long elapsed;
 	
 	boolean isPaused = true;
 	
@@ -15,21 +14,17 @@ public class GameTimer {
 
 	public GameTimer() {
 		millisRemaining = millisInit = 30000;
-		countDownInterval = 1000;
-		elapsed = 0;
 	}
-	private void createGameTimer() {
-		timer = new CountDownTimer(millisRemaining, countDownInterval) {
+	private void createGameTimer(long millis) {
+		timer = new CountDownTimer(millis, 1000) {
 			@Override
 			public void onFinish() {
-				elapsed = millisInit;
+				millisRemaining = 0;
 			}
 
 			@Override
 			public void onTick(long millisUntilFinished) {
-				//millisRemaining = millisUntilFinished;
-				millisRemaining = millisUntilFinished;;
-				//Log.d("test", toString());
+				millisRemaining = millisUntilFinished;
 			}
 		};
 	}
@@ -38,12 +33,22 @@ public class GameTimer {
 		if(timer!=null){
 			timer.cancel();
 		}
-		this.millisRemaining = 0;
+		
 	}
 	
 	public synchronized final GameTimer start(){
         if(isPaused){
-            createGameTimer();
+            createGameTimer(millisRemaining);
+            timer.start();
+            isPaused = false;
+        }
+        Log.d("test", toString());
+        return this;
+    }
+	
+	public synchronized final GameTimer add(long mill){
+        if(isPaused){
+            createGameTimer(mill+millisRemaining);
             timer.start();
             isPaused = false;
         }
@@ -64,10 +69,10 @@ public class GameTimer {
         return isPaused;
     }
     
-    public long elapsed() {
-    	return elapsed;
-    }
+	@SuppressLint("DefaultLocale") 
 	public String toString() {
-		return "" + millisRemaining / 60000 + ":" + millisRemaining / 1000 % 60;
+		int m = (int) (millisRemaining / (1000*60));
+		int s = (int) (millisRemaining / 1000) % 60 ;
+		return String.format("%02d:%02d", m, s);
 	}
 }
